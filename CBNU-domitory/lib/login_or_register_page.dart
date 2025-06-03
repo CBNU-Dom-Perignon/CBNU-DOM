@@ -22,6 +22,12 @@ class _LoginOrRegisterPageState extends State<LoginOrRegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    if (showLoginPage) {
+      // 로그인 페이지 표시, 전환 함수 전달
+      return LoginPage(onTap: togglePages);
+    } else {
+      // 회원가입 페이지 표시, 전환 함수 전달
+      return RegisterPage(onTap: togglePages);
+    }
   }
 }

@@ -1,12 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:untitled/themes/styles.dart';
-import 'package:untitled/themes/colors.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:untitled/common/custom_text_field.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final VoidCallback onTap; // 로그인 페이지로 전환하는 함수
+
+  const RegisterPage({super.key, required this.onTap});
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -16,9 +14,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _nicknameController = TextEditingController();
-  final _birthYearController = TextEditingController();
-  final _enrollYearController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -83,114 +78,108 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _nicknameController.dispose();
-    _birthYearController.dispose();
-    _enrollYearController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: white,
-      appBar: AppBar(title: Text('회원가입', style: mediumBlack18), titleSpacing: 0, backgroundColor: white, surfaceTintColor: white),
+      appBar: AppBar(title: const Text('회원가입')),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.person_add, size: 80),
+                const SizedBox(height: 30),
+                const Text('계정 만들기', style: TextStyle(fontSize: 24)),
+                const SizedBox(height: 30),
 
-              Text('닉네임', style: mediumBlack16),
-              SizedBox(height: 6.h),
-              CustomTextField(
-                controller: _nicknameController,
-                name: '닉네임을 입력하세요',
-                inputType: TextInputType.emailAddress,
-              ),
-              SizedBox(height: 20.h),
+                // 이메일 필드
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: '이메일',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 15),
 
-              Text('생년', style: mediumBlack16),
-              SizedBox(height: 6.h),
-              CustomTextField(
-                controller: _birthYearController,
-                name: '생년을 입력하세요 예)2002',
-                inputType: TextInputType.number,
-              ),
-              SizedBox(height: 20.h),
-
-              Text('학번', style: mediumBlack16),
-              SizedBox(height: 6.h),
-              CustomTextField(
-                controller: _enrollYearController,
-                name: '학번을 입력하세요 예)21',
-                inputType: TextInputType.number,
-              ),
-              SizedBox(height: 20.h),
-
-              Text('이메일', style: mediumBlack16),
-              SizedBox(height: 6.h),
-              CustomTextField(
-                controller: _emailController,
-                name: '이메일을 입력하세요',
-                inputType: TextInputType.emailAddress,
-              ),
-              SizedBox(height: 20.h),
-
-              Text('비밀번호', style: mediumBlack16),
-              SizedBox(height: 6.h),
-              CustomTextField(
-                controller: _passwordController,
-                name: '비밀번호를 입력하세요',
-                inputType: TextInputType.visiblePassword,
-                obscureText: true,
-              ),
-              SizedBox(height: 20.h),
-
-              Text('비밀번호 확인', style: mediumBlack16),
-              SizedBox(height: 6.h),
-              CustomTextField(
-                controller: _confirmPasswordController,
-                name: '비밀번호를 다시 입력하세요',
-                inputType: TextInputType.visiblePassword,
-                obscureText: true,
-              ),
-              SizedBox(height: 20.h),
-
-              // 에러 메시지 표시
-              if (_errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Text(
-                    _errorMessage!,
-                    style: mediumBlack14.copyWith(color: Colors.red),
-                    textAlign: TextAlign.center,
+                // 비밀번호 필드
+                TextField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: '비밀번호',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock),
                   ),
                 ),
-              SizedBox(height: 20.h)
-            ],
+                const SizedBox(height: 15),
+
+                // 비밀번호 확인 필드
+                TextField(
+                  controller: _confirmPasswordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: '비밀번호 확인',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.lock_outline),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // 에러 메시지 표시
+                if (_errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Text(
+                      _errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                const SizedBox(height: 20),
+
+                // 회원가입 버튼
+                _isLoading
+                    ? const CircularProgressIndicator()
+                    : SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: signUp,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                    ),
+                    child: const Text('회원가입', style: TextStyle(fontSize: 16)),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 로그인 페이지로 이동
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('이미 계정이 있으신가요?'),
+                    TextButton(
+                      onPressed: widget.onTap, // 전달받은 함수 호출
+                      child: const Text(
+                        '로그인',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if(_isLoading)
-              CircularProgressIndicator(),
-            SizedBox(height: 10.h),
-            SizedBox(
-              width: double.infinity,
-              height: 45.h,
-              child: ElevatedButton(
-                onPressed: signUp,
-                style: btnBlackRound30,
-                child: Text('회원가입하고 시작하기', style: mediumWhite16),
-            )
-            )
-          ]
-        )
       ),
     );
   }

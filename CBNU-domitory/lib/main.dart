@@ -3,9 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart'; // flutterfire configure 실행 후 생성됨
 import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_gate.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:untitled/start/start_page.dart';
 
 void main() async {
   // Flutter 엔진과 위젯 바인딩 초기화 보장
@@ -22,20 +19,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child){
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Flutter Firebase Auth',
-          theme: ThemeData(
-            primarySwatch: Colors.blue
-          ),
-          home: const AuthGate()
-        );
-      }
+    return MaterialApp(
+      title: 'Flutter Firebase Auth',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      // 인증 상태에 따라 다른 화면을 보여줄 위젯
+      home: const AuthGate(),
     );
   }
 }
